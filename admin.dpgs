@@ -1,0 +1,108 @@
+###################################################
+# Administration script for DPGS by ilia@lobsanov.com
+####################
+# Warning: not complete yet!
+###################################################
+
+&check_url;
+print "Content-type: text/html\n\n";
+
+&AskPass("Enter Password") unless defined($FORM{'password'});
+
+# Check password
+open(ADMIN_FILE, "$path_to_data/admin") || &error("Can't open $path_to_data/admin");
+while (<ADMIN_FILE>) {
+	chop;
+	my($key, $value) = split(/$delimiter/);
+    $ADMIN{$key} = $value;
+}
+close(ADMIN_FILE);
+
+&AskPass("Invalid Password! Try again.") unless ($ADMIN{'password'} eq $FORM{'password'});
+	
+if ( defined($FORM{'type'}) ) {
+	if ( $FORM{'type'} eq "add" ) {
+    
+		# Find next available id
+		my($highest_id) = 0;
+		for (@members_list) {
+			my($id) = (split(/$delimiter/, $_))[0];
+			if ( $id > $highest_id ) { $highest_id = $id; }
+		}
+		$highest_id++;
+        
+		# Create user directory
+		mkdir("$path_to_members/$highest_id", 0777) unless ( -e "$path_to_members/$highest_id");
+
+		# Make random password
+        srand(time ^ $$);
+		for (1..4) { $pwd .= round(rand(9)); }
+        
+        # @members_list -> %lines (key=name, value=line)
+        for (@members_list) {
+        	my($id, $name, $password) = split(/$delimiter/, $_);
+        	$lines{$name} = $_;
+        }
+        # Check if name already exists
+        if ( defined($lines{$FORM{'name'}}) ) {
+            &error("$FORM{'name'} already in database");
+        }
+        
+        # Add new member
+        $lines{$FORM{'name'}} = "$highest_id$delimiter$FORM{'name'}$delimiter$pwd";
+        
+        # Generate sorted members.idx from %lines
+        open(MEMBERS_LIST, ">$path_to_data/members.idx") || &error("Can't create MEMBERS_LIST file");
+        foreach $name (sort (keys (%lines))) {
+            print MEMBERS_LIST "$lines{$name}\n";
+        }
+        close(MEMBERS_LIST);
+        
+        # Print Results Page
+		&html_header("Results");
+		print <<end;
+Successfully added <B>$FORM{'name'}</B> in $path_to_members/$highest_id<BR>
+<U>Next:</U>
+<OL>
+<LI>Upload member's photo to $path_to_members\\$highest_id. Note: the photo file must be either &quot;photo.gif&quot; or &quot;photo.jpg&quot;
+<LI><B>$FORM{'name'}</B>'s password is $pwd. Please email the new member ASAP.
+</OL>
+<P><font size=-1><I>These steps should be done automatically in 
+next release of Admin script (you are welcome to write it)</I></font><BR>
+<HR>
+end
+        &PrintAdmin;
+		&html_trailer;
+	}
+    
+	exit;
+}
+
+# PrintAdmin
+&html_header("Administrator Page");
+&PrintAdmin;
+&html_trailer;
+
+sub PrintAdmin {
+    print <<end;
+<FORM ACTION="$DETAILS{'DPGS'}" METHOD="POST">
+<INPUT TYPE=SUBMIT VALUE="Add new member:"><INPUT TYPE=TEXT NAME="name" SIZE=10>  <I>(name)</I>
+<INPUT TYPE=HIDDEN NAME="type" VALUE="add">
+<INPUT TYPE=HIDDEN NAME="action" VALUE="admin">
+<INPUT TYPE=HIDDEN NAME="password" VALUE="$FORM{'password'}">
+</FORM>
+end
+}
+
+# AskPass
+sub AskPass {
+	&html_header("Input Password");
+	print qq(<FORM ACTION="$DETAILS{'DPGS'}" METHOD="POST">\n);
+	print qq(Password: <INPUT TYPE=PASSWORD NAME="password" SIZE=10>\n);
+	print qq(<INPUT TYPE=HIDDEN NAME="action" VALUE="admin">\n);
+    print qq(<INPUT TYPE=SUBMIT VALUE="Submit">\n</FORM>\n);
+	&html_trailer;
+	exit;
+}
+
+1;

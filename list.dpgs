@@ -1,0 +1,268 @@
+########################################################
+# "list.dpgs" Perl script by ilia@lobsanov.com
+############
+# 
+########################################################
+
+print "Content-type: text/html\n\n";
+my $type = $FORM{'type'};
+
+if ( $type eq "nav" ) {
+###################################################
+# Return navigation frame consisting of first letters of member names in alphabetical order
+#
+    my @alphabet = ();
+    for (@members_list) {
+        push(@alphabet, substr( (split(/$delimiter/, $_))[1], 0, 1));
+    }
+    @alphabet = sort(@alphabet);
+    my $prev = 'nonesuch';
+    @alphabet = grep($_ ne $prev && ($prev = $_), @alphabet); #removes duplicates
+
+    for (@alphabet) {
+        $DETAILS{'alpha_index'} .= qq(<A HREF="$DETAILS{'DPGS'}?action=list&type=$_" TARGET="main" CLASS="ALPHA">$_</A>);
+        $DETAILS{'alpha_index'} .= " &#183; " unless ( $_ eq $alphabet[$#alphabet] );
+    }
+        
+	&MostRecent;
+	&BdayNotify(20);
+    
+	open(TEMPLATE, "$path_to_templates/list_nav.html") 
+        || &error("Couldn't open $path_to_templates/list_nav.html");
+    &replace_values(TEMPLATE);
+    
+#
+#
+###################################################
+}
+
+elsif ( $type eq "full" ) {
+###################################################
+# All-At-Once: Return page consisting of all members' thumbnails
+#
+
+	for ( my $i = 0; $i < @members_list; $i ++ ) {
+		my ($id, $name) = (split(/$delimiter/, $members_list[$i]))[0,1];
+		my $img_src = &get_thumb($id); # Find member's thumbnail
+		
+        if ( $i != 0 && $i % 7 == 0 ) {	
+            $DETAILS{'content'} .= "</TR></TABLE>\n"; 
+        }
+		if ( $i % 7 == 0 ) { 
+            $DETAILS{'content'} .= "<TABLE BORDER=0 CELLSPACING=8><TR>\n";	
+        }
+		$DETAILS{'content'} .= qq(<TD WIDTH=80 VALIGN=TOP ALIGN=CENTER>);
+        $DETAILS{'content'} .= qq(<A HREF="$DETAILS{'DPGS'}?action=show&id=$id">);
+		$DETAILS{'content'} .= qq(<IMG WIDTH=43 HEIGHT=56 SRC="$img_src" ALT="$name" BORDER=1></A><BR>\n);
+		$DETAILS{'content'} .= qq(<FONT SIZE=-1><A HREF="$DETAILS{'DPGS'}?action=show&id=$id">$name</A></FONT></TD>\n);
+	}
+    $DETAILS{'content'} .= "</TR></TABLE>\n";
+
+    open(TEMPLATE, "$path_to_templates/list_full.html") 
+        || &error("Couldn't open $path_to_templates/list_full.html");
+    &replace_values(TEMPLATE);
+#
+#
+###################################################
+}
+
+elsif ( $type eq "dartboard" ) {
+###################################################
+# Dart Board: Return a table of thumbnails only
+#
+
+    my $rows = round(sqrt($#members_list));
+    for ( my $i = 0; $i < @members_list; $i ++ ) {
+		my ($id, $name) = (split(/$delimiter/, $members_list[$i]))[0,1];
+		# Find member's thumbnail
+		my $img_src = &get_thumb($id);
+		
+        if ( $i != 0 && $i % $rows == 0 ) {	
+            $DETAILS{'content'} .= "</TR></TABLE>\n"; 
+        }
+		if ( $i % $rows  == 0 ) { 
+            $DETAILS{'content'} .= "<TABLE BORDER=0 CELLSPACING=0 CELLPADDING=0><TR>\n";
+        }
+		$DETAILS{'content'} .= qq(<TD><A HREF="$DETAILS{'DPGS'}?action=show&id=$id">);
+		$DETAILS{'content'} .= qq(<IMG WIDTH=43 HEIGHT=56 SRC="$img_src" ALT="$name" BORDER=0></A></TD>\n);
+	}
+    $DETAILS{'content'} .= "</TR></TABLE>\n";
+
+    open(TEMPLATE, "$path_to_templates/list_dartboard.html") 
+        || &error("Couldn't open $path_to_templates/list_dartboard.html");
+    &replace_values(TEMPLATE);
+#
+#
+###################################################
+}
+
+elsif ( $type eq "sort" ) {
+###################################################
+# Sort: Return more recent thumbnails first
+#
+
+    opendir(MEMBERS_DIR, $path_to_members) || &error("Couldn't open $path_to_members");
+    my @dirs = grep (!/^\.\.?$/, readdir(MEMBERS_DIR));
+    closedir(MEMBERS_DIR);
+    for (@dirs) {
+        $mtime{$_} = (stat("$path_to_members/$_/data.txt"))[9];
+    }
+    my @sorted_ids = sort by_values_mtime (keys (%mtime)); 
+    
+    # map id -> name
+    for (@members_list) {
+    	my($id, $name) = (split(/$delimiter/, $_))[0,1];
+    	$name{$id} = $name;
+    }
+    
+    for (@sorted_ids) {
+        my $img_src = &get_thumb($_);
+        $DETAILS{'content'} .= qq(<A HREF="$DETAILS{'DPGS'}?action=show&id=$_">);
+        $DETAILS{'content'} .= qq(<IMG SRC="$img_src" BORDER=0 WIDTH=43 HEIGHT=56 ALT="$name{$_}"></A><BR>\n);
+        $DETAILS{'content'} .= qq(<A HREF="$DETAILS{'DPGS'}?action=show&id=$_">$name{$_}</A>);
+        $DETAILS{'content'} .= " updated " . &get_date($mtime{$_}) . " <BR>\n";
+    }
+    
+    open(TEMPLATE, "$path_to_templates/list_sort.html") 
+        || &error("Couldn't open $path_to_templates/list_sort.html");
+    &replace_values(TEMPLATE);
+#
+#
+###################################################
+}
+
+else {
+###################################################
+# Find all members with required first letter
+#
+
+	my $i = 0;
+	for (@members_list) {
+		my ($id, $name) = (split(/$delimiter/, $_))[0,1];
+		my $name_char1 = substr($name, 0, 1);
+		if ( $name_char1 eq $type ) {
+			$wanted_id[$i] = $id;
+			$wanted_name[$i++] = $name;
+		}
+	}
+    
+	print "<HTML>\n<BODY $DETAILS{'body'}>\n";
+    print "<CENTER><TABLE BORDER=0 CELLSPACING=8><TR>\n";
+	
+	my $width = round(100/$i)."%" unless ( $i == 0 );
+
+	for ( $i = 0; $i < @wanted_name; $i ++ ) {
+		my $img_src = &get_thumb($wanted_id[$i]); # Find member's thumbnail
+		
+		print qq(<TD NOWRAP VALIGN=TOP ALIGN=CENTER WIDTH="$width"><A HREF="$DETAILS{'DPGS'}?action=show&id=$wanted_id[$i]">);
+		print qq(<IMG WIDTH=43 HEIGHT=56 SRC="$img_src" ALT="$wanted_name[$i]" BORDER=1 VSPACE=3></A><BR>\n);
+		print qq(<A HREF="$DETAILS{'DPGS'}?action=show&id=$wanted_id[$i]">$wanted_name[$i]</A></TD>\n);
+	}
+	print "</TR></TABLE></CENTER>\n";
+	print "</BODY></HTML>";
+#
+#
+###################################################
+}
+
+if (defined($t0)) { 
+    $t1 = new Benchmark;
+    print "\n<!--Execution time:",timestr(timediff($t1, $t0)),"-->\n";
+}
+
+###################################################
+# SUBROUTINES
+
+sub MostRecent {
+    open(FILE, "$path_to_data/recent.dat") || return;
+    ($DETAILS{'MostRecent_ID'},$DETAILS{'MostRecent_Name'},$time) = split(/$delimiter/, <FILE>);
+    close(FILE);
+        
+    my ($min,$hour,$mday,$mon) = (localtime($time))[1,2,3,4];
+    $DETAILS{'MostRecent_Month'} = ++$mon;
+    $DETAILS{'MostRecent_Mday'} = $mday;
+    $DETAILS{'MostRecent_Time'} = sprintf("%02d:%02d",$hour,$min);
+}
+
+sub BdayNotify {
+	my $days_to_notify = $_[0];
+	my $time = time;
+	my ($mday, $mon, $year) = (localtime($time))[3,4,5];
+	$mon++;	$year += 1900;
+	my @monthDays = (0,31,28,31,30,31,30,31,31,30,31,30,31);
+	if ( (year % 4 == 0 && $year % 100 != 0) || $year % 400 == 0 ) {
+		$monthDays[2] = 29; #leap year
+	}
+	# Find birthdays in this and next month
+	opendir(MEMBERS_DIR, $path_to_members) || &error("Couldn't open $path_to_members");
+	my @dirs = grep (!/^\.\.?$/, readdir(MEMBERS_DIR));
+	closedir(MEMBERS_DIR);
+	foreach $dir (@dirs) {
+		my $dob_mon = 0;
+		my $dob_mday = 0;
+		open(DATA, "$path_to_members/$dir/data.txt") || next;
+		while (<DATA>) {
+			# Get dob_mon and dob_mday
+			chop;
+			if ( $_ =~ "dob_mon" ) {
+				$dob_mon = (split(/$delimiter/))[1];
+			} elsif ( $_ =~ "dob_mday" ) {
+				$dob_mday = (split(/$delimiter/))[1];
+			}
+		}
+		close(DATA);
+		if ( $dob_mon == $mon ) {
+			next if ( $dob_mday < $mday );
+			foreach $line (@members_list) {
+				($id, $name) = (split(/$delimiter/, $line))[0,1];
+				if ( $dir eq $id ) { last; }
+			}
+			$daysleft{$name} = $dob_mday-$mday;
+		} elsif ( $dob_mon == ($mon+1) ) {
+			foreach $line (@members_list) {
+				($id, $name) = (split(/$delimiter/, $line))[0,1];
+				if ( $dir eq $id ) { last; }
+			}
+			$daysleft{$name} = $dob_mday+($monthDays[$mon]-$mday);
+		}
+ 	}
+	my @names = sort by_values_daysleft (keys (%daysleft)); 
+	for (@names) 
+	{
+		next if ( $daysleft{$_} > $days_to_notify );
+		if ( $daysleft{$_} > 1 ) {
+			$DETAILS{'birthdays'} .= "$_\'s birthday is in $daysleft{$_} days.<BR>";
+		} elsif ( $daysleft{$_} == 1 ) {
+			$DETAILS{'birthdays'} .= "$_\'s birthday is tomorrow!<BR>";
+		} elsif ( $daysleft{$_} == 0 ) {
+			$DETAILS{'birthdays'} .= "Happy Birthday $_!<BR>";
+		}
+	}
+	$DETAILS{'balloons'} = qq(<img src="/images/baloons.gif" hspace=3 border=0>) 
+        if ( defined($DETAILS{'birthdays'}) );
+}
+
+
+sub by_values_mtime
+{
+    ($mtime{$b} <=> $mtime{$a});
+} 
+
+sub by_values_daysleft
+{
+    ($daysleft{$a} <=> $daysleft{$b});
+} 
+
+ 
+sub get_thumb {
+	my $id = $_[0];
+	opendir(DIR, "$path_to_members/$id") || return -1;
+	my @file = grep (/^thumb\.[jpg|gif|png]/, readdir(DIR));
+	closedir(DIR);
+	if ( $#file != -1 ) {
+        my $img_src = pop(@file);
+        return "$photos_url/$id/$img_src";
+    }
+}
+
+1;

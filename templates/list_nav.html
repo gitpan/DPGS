@@ -1,0 +1,65 @@
+<HTML>
+<HEAD>
+<TITLE>%%home%%: Navigation</TITLE>
+<STYLE>
+A:link { color:blue; }
+A:hover { color:red; } 
+.ALPHA { text-decoration: none; }
+</STYLE>
+
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+function go(jumper) {
+    url = jumper.options[jumper.selectedIndex].value;
+    if ( url == "none" ) return;
+    
+    if ( url == "/" ) parent.location = url;
+    else parent.main.location = url;
+    jumper.selectedIndex = 0;
+}
+//-->
+</SCRIPT>
+</HEAD>
+
+<BODY %%body%%>
+
+<CENTER><FORM>
+<TABLE WIDTH="100%" BORDER="1" CELLSPACING="0" BGCOLOR="#E6E6E6" BORDERCOLOR="#C0C0C0"><TR><TD ALIGN="CENTER"><FONT SIZE="+1">
+%%alpha_index%%
+</FONT></TD></TR></TABLE>
+
+
+<table width="100%" border=0 cellspacing=0 cellpadding=2><tr>
+	<td align=left valign=top width="40%">
+	<FONT FACE="Comic Sans MS" SIZE="-1" COLOR="#000080">
+    Last update: <a href="%%DPGS%%?action=show&id=%%MostRecent_ID%%" TARGET="main">%%MostRecent_Name%%</A>
+     on %%MostRecent_Month%%/%%MostRecent_Mday%% @ %%MostRecent_Time%% PST</font>
+	</td>
+    <td valign=top align=center>
+    <SELECT NAME="jumper" onChange="go(this)">
+    <OPTION VALUE="none">Choose a View
+    <OPTION VALUE="%%DPGS%%?action=list&type=full">All-At-Once
+    <OPTION VALUE="%%DPGS%%?action=list&type=dartboard">Dart Board
+    <OPTION VALUE="%%DPGS%%?action=list&type=sort">Sort by last updates
+    <OPTION VALUE="frMain.html#Search">Search
+    <OPTION VALUE="frMain.html">Gallery Front Page
+    <OPTION VALUE="/">- Return to forum -
+    </SELECT>
+    <NOSCRIPT><br>
+    Please turn on JavaScript
+    </NOSCRIPT>
+    </td>
+	<td align=right width="40%">
+	<table border=0 cellspacing=0 cellpadding=0><tr>
+		<td valign=top>%%balloons%%</td>
+		<td valign=top><FONT FACE="Comic Sans MS" SIZE="-1" COLOR="#000080">
+        %%birthdays%%</font></td>
+	</tr></table>
+	</td>
+</tr></table>
+</FORM>
+
+<hr size=1>Questions? Comments? Please email %%webmaster%%
+
+</CENTER>
+</BODY></HTML>

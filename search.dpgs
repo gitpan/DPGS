@@ -1,0 +1,64 @@
+########################################################
+# "search.dpgs" Perl script by ilia@lobsanov.com
+############
+#
+########################################################
+
+print "Content-type: text/html\n\n";
+
+$FORM{'keywords'} =~ s/\"/ /g;
+my @keywords = split(/\s+/, $FORM{'keywords'});
+
+opendir(MEMBERS_DIR, $path_to_members) || &error("Couldn't open $path_to_members");
+my @members = grep (!/^\.\.?$/, readdir(MEMBERS_DIR));
+chomp(@members);
+closedir(MEMBERS_DIR);
+
+foreach $member (@members) {
+    open (FILE, "$path_to_members/$member/data.txt") || next;
+    my @LINES = <FILE>;
+    close (FILE);
+    for (@LINES) {
+    	chop($_);
+    	$line = (split(/$delimiter/, $_))[1];
+    }
+    my $string = join(' ',@LINES);
+    $string =~ s/\n//g;
+    my $value = 0;
+    for (@keywords) {
+        my $test = ($string =~ s/$_//ig);
+        if ($test < 1) {
+            $value = 0;
+            last;
+        }
+        else {
+            $value = $value+$test;
+        }
+    }
+    if ($value > 0) {
+        push (@keywordmatches, $member);
+    }
+ }
+
+&html_header("Search results");
+
+if ( $#keywordmatches < 0 ) {
+    print "No matches to your query.\n";
+    &html_trailer;
+    exit;
+}
+
+# map id -> name
+for (@members_list) {
+	my ($id, $name) = (split(/$delimiter/, $_))[0,1];
+	$MEMBERS{$id} = $name;
+}
+
+print "Profiles containing the keyword(s) <B>$FORM{'keywords'}</B>:<P>\n<OL>\n";
+foreach $member_id (@keywordmatches) {
+    print qq(<LI><A HREF="$DETAILS{'DPGS'}?action=show&id=$member_id">$MEMBERS{$member_id}</A>\n);
+}
+print "</OL>\n";
+&html_trailer;
+
+1;

@@ -1,0 +1,133 @@
+########################################################
+# "show.dpgs" Perl script by ilia@lobsanov.com
+############
+# This script serves several purposes:
+# 	1. It is used to display member details from the member's data file.
+#	2. It is used to login a member and display an update profile form.
+# 	Display output is formatted using a template html file with  
+#	placeholders for each data field.
+########################################################
+
+# find the name
+my $i = 0;
+for (@members_list) {
+	($DETAILS{'id'}, $DETAILS{'name'}, $DETAILS{'password'}) = split(/$delimiter/, $_);
+	if ( $DETAILS{'id'} == $FORM{'id'} ) { chop($DETAILS{'password'}); last; }
+	$i++;
+}
+
+# Open member's database file.
+if ( open(DATABASE, "$path_to_members/$DETAILS{'id'}/data.txt") ) {
+	my @database = <DATABASE>;
+	# Calculate last update of database file
+	$DETAILS{'last_modified'} = &get_date( (stat(DATABASE))[9] );
+	close(DATABASE);
+    
+    # Put contents into the DETAILS associative array.
+    for (@database) {
+    	chop($_);
+    	my($key, $value) = split(/$delimiter/, $_);
+    	$DETAILS{$key} = $value;
+    }
+}
+
+# If password is specified, login and return form to update profile.
+# Otherwise, display details page.
+if ( defined($FORM{'password'}) && $FORM{'password'} ne '' ) {
+	&check_url;
+    print "Content-type: text/html\n\n";
+    
+	# Check password
+	if ( $DETAILS{'password'} ne $FORM{'password'} ) {
+		&html_header("Access Denied! Invalid Password.");
+		print("Passwords are case-sensitive.<BR>\n");
+		&html_trailer;
+		exit;
+	}
+	
+	open(TEMPLATE, "$path_to_templates/update_profile.html") 
+        || &error("Couldn't open $path_to_templates/update_profile.html");
+
+    for ( 1..31 ) {
+        $DETAILS{'dob_date_options'} .= "<OPTION VALUE=\"$_\">$_";
+    }
+	$DETAILS{'last_words'} =~ s/<BR>/\n/gi; # Fix for viewing in <TEXTAREA>
+
+	&replace_values(TEMPLATE);
+}
+else {
+    require 'cookie.lib';
+    if ( defined($DETAILS{'private'}) ) {   
+        if ( &GetCookies("$DETAILS{'home'} private view") ) {
+        # User already has "private view" cookie; thus can view private profiles   
+            print "Content-type: text/html\n\n";
+        }
+        else {
+        # User cannot view private profiles; ask for authorization
+            if ( defined($FORM{'show_password'}) ) {
+                for (@members_list) {
+                    chop($_);
+                    my ($name, $password) = (split(/$delimiter/, $_))[1,2];
+                    if ( $FORM{'name'} eq $name ) {
+                        if ( $FORM{'show_password'} eq $password ) {
+                        # Set "private view" cookie so that user doesn't have to enter password again
+                            print "Content-type: text/html\n";
+                            &SetCookies("$DETAILS{'home'} private view","ok");
+                            print "\n";
+                            last;
+                        }
+                        else {
+                            &AskPass("Invalid Password. Please try again.");
+                        }
+                    }
+                }
+            }
+            else { &AskPass("Password required to view $DETAILS{'name'}"); }
+        }
+    }
+
+	# Find previous and next id
+	$DETAILS{'prev_id'} = (split(/$delimiter/, $members_list[$i-1]))[0]
+		|| (split(/$delimiter/, $members_list[$#members_list]))[0];
+	$DETAILS{'next_id'} = (split(/$delimiter/, $members_list[$i+1]))[0]
+		 || (split(/$delimiter/, $members_list[0]))[0];
+    
+	# Find the photo
+	if ( opendir(DIR, "$path_to_members/$DETAILS{'id'}") ) {
+		my @file = grep (/^photo\.[jpg|gif|png]/, readdir(DIR));
+		closedir(DIR);
+		if ( $#file != -1 ) {
+			my $img_src = pop(@file);
+       		$DETAILS{'image1'} = qq(<IMG SRC="$photos_url/$DETAILS{'id'}/$img_src">);
+		}
+	}
+    
+	open(TEMPLATE, "$path_to_templates/details.html") 
+        || &error("Couldn't open $path_to_templates/details.html");
+	&replace_values(TEMPLATE);
+
+#    $t1 = new Benchmark;
+#    print "\n<!--Execution time:",timestr(timediff($t1, $t0)),"-->\n";
+}
+
+sub AskPass {
+    print "Content-type: text/html\n\n";
+    &html_header("$_[0]");
+    print qq(<FORM ACTION="$DETAILS{'DPGS'}" METHOD="POST">\n);
+    print "This profile is private.<BR>If you are a member, please input your password:<BR>\n";
+    print qq(<SELECT NAME="name">\n);
+    print qq(<OPTION VALUE="" SELECTED>Select your name...);
+    for (@members_list) {
+        my $name = (split(/$delimiter/, $_))[1];
+        print qq(<OPTION VALUE="$name">$name);
+    }
+    print qq(</SELECT>\n);
+    print qq(<INPUT TYPE=HIDDEN NAME="action" VALUE="show">);
+    print qq(<INPUT TYPE=HIDDEN NAME="id" VALUE="$FORM{'id'}">);
+    print qq(<INPUT TYPE=PASSWORD NAME="show_password" SIZE="15"> <INPUT TYPE=SUBMIT VALUE="OK">\n);
+    print "</FORM>\n";
+    &html_trailer;
+    exit;
+}
+
+1;

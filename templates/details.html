@@ -1,0 +1,141 @@
+<HTML>
+<HEAD>
+	<TITLE>%%home%%: %%name%%</TITLE>
+</HEAD>
+
+<BODY %%body%%>
+
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+<TR>
+<td align="LEFT"><FONT SIZE="+3" COLOR="#000080">%%name%%</FONT>
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+function Login() {
+	var password = prompt("Please enter your password", "");
+	if ( password == null ) { return; }
+	if ( !document.LoginForm && document.location.reload ) {
+		alert("Error: document has not loaded completely.\nPress OK to Reload.");
+		document.location.reload();
+		return;
+	}
+	document.LoginForm.password.value = password;
+	document.LoginForm.submit();
+}
+document.write('<A HREF="javascript:Login()" onMouseOver="window.status=\'Click to update profile\';return true;" onMouseOut="window.status=\'\';return true;"><IMG SRC="/images/access.gif" WIDTH=31 BORDER=0 HEIGHT=24 ALIGN="ABSMIDDLE" ALT="Click to update profile"></A>');
+//-->
+</SCRIPT>
+
+<NOSCRIPT>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<font color="#FF0000"><b>[ Warning: this section best experienced with JavaScript enabled ]</b></font>
+</NOSCRIPT>
+</TD>
+<td align="RIGHT"><a href="%%DPGS%%?action=show&id=%%prev_id%%"><img src="/images/arrow_left.gif" width=36 height=36 border=0 alt="Previous"></a> <a href="%%DPGS%%?action=show&id=%%next_id%%"><img src="/images/arrow_right.gif" width=36 height=36 border=0 alt="Next"></a></TD>
+</TR>
+</TABLE>
+%%image1%%
+<BR><FONT COLOR="#000080"><B>%%about_image1%%</B></FONT>
+</P>
+
+<P>
+<FONT COLOR="#000080">Age:</FONT> %%age%%  
+<SCRIPT LANGUAGE="JavaScript1.1">
+<!--
+var months = new Array();
+months = ",January,February,March,April,May,June,July,August,September,October,November,December".split(",");
+var dob_mon = "%%dob_mon%%";
+if ( dob_mon != "" ) {
+    document.write("[Born " + months[dob_mon] + " %%dob_mday%%]");
+}
+//-->
+</SCRIPT><BR>
+<FONT COLOR="#000080">Current location:</FONT> %%location%% <BR>
+<FONT COLOR="#000080">Originally from:</FONT> %%origin%% <BR>
+<FONT COLOR="#000080">Marital status:</FONT> %%marital_status%% <BR>
+<FONT COLOR="#000080">Occupation:</FONT> %%occupation%% <BR>
+<FONT COLOR="#000080">Sex:</FONT> %%sex%% <BR>
+<FONT COLOR="#000080">Addicted to VR since:</FONT> %%addicted_since%%
+	
+<P>
+<FONT SIZE="+1">My favourites:</FONT><BR>
+<FONT COLOR="#000080">Book:</FONT> %%fav_book%% &nbsp;&nbsp; <FONT COLOR="#000080">Last book I read:</FONT> %%last_book%%<BR>
+<FONT COLOR="#000080">Movie:</FONT> %%fav_movie%%<BR>
+<FONT COLOR="#000080">Music:</FONT> %%fav_music%%<BR>
+<FONT COLOR="#000080">Song:</FONT> %%fav_song%%<BR>
+<FONT COLOR="#000080">Quote:</FONT> %%fav_quote%%<BR>
+<FONT COLOR="#000080">Food:</FONT> %%fav_food%%<BR>
+<FONT COLOR="#000080">Drink:</FONT> %%fav_drink%%<BR>
+<FONT COLOR="#000080">Color:</FONT> %%fav_color%%
+
+<P>
+<FONT SIZE="+1">The &quot;classic&quot; questions:</FONT><BR>
+<FONT COLOR="#000080">1. What would you do if you had 3 wishes granted by a Genie?</FONT><BR>
+&nbsp;&nbsp;&nbsp; %%classic_question1%%<BR>
+<FONT COLOR="#000080">2. Who would you like to be stranded on a deserted island with?</FONT><BR>
+&nbsp;&nbsp;&nbsp; %%classic_question2%%<BR>
+<!--
+3. If you HAD to be visited by one of the following, which would it be:<BR>
+ A: Insurance Salesman<BR>
+ B: Proctologist<BR>
+ C: Annoying Door To Door Religious Membership Seeker<BR>
+ D: An annoying religious membership seeker,
+ <BR>who sells insurance for a living and offers a free exam if you join his group<BR>
+&nbsp;&nbsp;&nbsp; <B>%%classic_question3%%</B>
+-->
+<P>%%last_words%%
+
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+function ReachMe() {
+	var homepage_msg = "", email_msg = "", uin_msg = "", msg = "";
+	var header = '<P><FONT SIZE="+1">You can reach me at:</FONT>';
+	if ( "%%homepage%%" != "" ) {
+		homepage_msg = '<BR><A HREF="%%homepage%%" TARGET="_parent">%%homepage%%</A>';
+	}
+	if ( "%%email%%" != "" ) {
+		email_msg = '<BR><A HREF="mailto:%%email%%">%%email%%</A>';
+	}
+	if ( "%%uin%%" != "" ) {
+		uin_msg = '<BR><A HREF="http://wwp.mirabilis.com/%%uin%%/">UIN %%uin%%</A>';
+	}
+	
+	msg = homepage_msg + email_msg + uin_msg;
+	if ( msg != "" ) {
+		document.write(header + msg);
+	}
+}
+ReachMe();
+//-->
+</SCRIPT>
+
+<P>
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+<tr>
+<td align="LEFT"><FONT SIZE="-1"><I>Profile last modified: %%last_modified%% PST.</I></FONT></td>
+<td align="RIGHT"><a href="%%DPGS%%?action=show&id=%%prev_id%%"><img src="/images/arrow_left.gif" width=36 height=36 border=0 alt="Previous"></a> <a href="%%DPGS%%?action=show&id=%%next_id%%"><img src="/images/arrow_right.gif" width=36 height=36 border=0 alt="Next"></a></TD>
+</tr>
+</table>
+
+
+<FORM NAME="LoginForm" METHOD=POST ACTION="%%DPGS%%">
+<INPUT TYPE=HIDDEN NAME="action" VALUE="show">
+<INPUT TYPE=HIDDEN NAME="id" VALUE="%%id%%">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+document.write('<INPUT TYPE=HIDDEN NAME="password">');
+//-->
+</SCRIPT>
+<NOSCRIPT>
+Password: <INPUT TYPE=PASSWORD SIZE=15 MAXLENGTH=20 NAME="password"> <INPUT TYPE=SUBMIT VALUE="Update Profile">
+</NOSCRIPT>
+</FORM>
+
+<HR>
+<A HREF="%%home_url%%" TARGET="_top">%%home%%</A>
+
+<P><font size=1>
+Powered by <a href="http://lobsanov.com/ilia/DPGS" TARGET="_top">%%version%%</A></font>
+</P>
+
+</BODY>
+</HTML>

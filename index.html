@@ -1,0 +1,225 @@
+<html>
+<head>
+<title>Lobsanov.com - Ilia - Duma.Photo.Gallery.System</title>
+<META name="description" content="Duma Photo Gallery System (DPGS) is a free open-source tool for enhancing virtual communities, discussion groups and message boards with dynamically generated photographic member profiles">
+<META name="keywords" content="Duma Photo Gallery System, DPGS, PG, Virtual Community, message board, discussion group, russian, perl"> 
+</head>
+
+<body bgcolor="white">
+
+<h2>Duma Photo Gallery System (v0.99.4)</h2>
+Copyright &copy; 1998-99 <a href="http://lobsanov.com/ilia">Ilia Lobsanov</A> 
+<HR>
+<B>DPGS</B> is a free and <i>open-source</i><i> </i> tool for enhancing virtual 
+communities, discussion groups and message boards with dynamically generated photographic 
+member profiles. Together, I call them the Duma. (there is a history behind the 
+name) 
+<P> The tool is comprised of several scripts written in Perl and can be used on 
+    any server/platform supporting Perl 5.<br>
+  The major advantage lies in the usage of html templates for presenting the member 
+  profile and the form to update profile. Thus, it is simple to customize the 
+  major pages returned to the client:<br>
+<UL>
+    <LI>Details/Bio: <A HREF="http://lobsanov.com/ilia/DPGS/templates/details.html">details.html</A> 
+    <LI>Update Profile Form: <A HREF="http://lobsanov.com/ilia/DPGS/templates/update_profile.html">update_profile.html</A> 
+</UL>
+<p>All dynamic data (eg. Location) is designated by placeholders (eg. %%Location%%). 
+    To add more data (fields), simply make up your own placeholders. If you can 
+    come up with a better design, feel free to <a href="mailto:ilia@lobsanov.com?subject=DPGS">contribute</a> 
+    it to the working examples.</p>
+<p>Additional templates include: <a href="http://lobsanov.com/ilia/DPGS/templates/list_sort.html">list_sort.html</a>, 
+    <a href="http://lobsanov.com/ilia/DPGS/templates/list_nav.html">list_nav.html</a>, 
+    <a href="http://lobsanov.com/ilia/DPGS/templates/list_full.html">list_full.html</a>, 
+    <a href="http://lobsanov.com/ilia/DPGS/templates/list_dartboard.html">list_dartboard.html</a> 
+    (more about these later in <a href="#table1">Table 1</a> below).</p>
+<p><b>Major features:</b></p>
+<ul>
+    <li>Birthday notification: all birthdays within a certain time period (default=20 
+        days) are displayed.</li>
+    <li> Semi-private: users can optionally make their profile private to allow 
+        only other members to view their profile. Cookie.lib is used here only 
+        to assign a &quot;private view&quot; session-based cookie such that the 
+        member doesn't have to re-authorize.</li>
+    <li>Searchable profiles.</li>
+    <li>User-friendly despite the complexity.</li>
+</ul>
+<P><B>Working examples:</B> 
+<UL>
+  <LI><a href="http://russia.virtualcomm.com/PG">Virtual Russians</A> - This is 
+    where it all started. I devised the system specifically for the Virtual Russia 
+    v-community. <br>
+    <i>I recommend you take a look to get an idea of how it works.</i>
+</UL>
+
+<P>
+<B>Download:</B>
+<UL>
+    <LI><a href="http://lobsanov.com/ilia/DPGS/DPGS.zip">DPGS.zip</A> (~37K) 
+        <ul>
+            <li>This is an exact copy of the setup for Virtual Russia</li>
+            <li>Read the contained instructions in readme.txt</li>
+        </ul>
+<!--
+    <li><a href="http://lobsanov.com/ilia/DPGS/webbbs.dpgs">webbbs.dpgs</a> (&lt;1K) 
+        <ul>
+            <li>This is a &quot;plugin&quot; for DPGS</li>
+            <li>Download this if you use WebBBS and would like it to integrate 
+                with DPGS, such that a poster's name is linked to corresponding 
+                profile. </li>
+        </ul>
+    </li> -->
+</UL>
+
+<P><B>How does it work?</B>
+<P> First, to make it work, you must configure some variables in the file DPGS. 
+    This is also the file that you will reference in your web page links. For 
+    example, to show user profile #1, use <font color="#804000">http://yourhost/DPGS?action=show&amp;id=1</font>. 
+    See <a href="#table1">table 1</a> for more examples. 
+<P>All data is stored in plain text. Each member gets a directory under the <font color="#804000">id</font> 
+  number within the <font color="#804000">members</font> directory. The suggested 
+  structure is as follows: 
+<pre>
+  PG/<font color="#804000">members</font>/<font color="#804000">id</font>
+               /data.txt -> format: key==value\n
+               /photo.jpg|gif|png
+               /thumb.jpg|gif|png
+
+  <font color="#804000">PG_data</font> -> <U>non-public</U> dir
+         /members.idx -&gt; index file of all the members; format: id==name==password\n 
+</pre>
+<p>To add a member, you need only upload the photo and thumbnail and add an entry 
+    into the members.idx file. <br>
+    Currently, there is a limited administration feature, which adds the entry 
+    and sorts members.idx, but doesn't upload the photos for you. Yet.</p>
+<P>
+<A NAME="table1"> </A>
+<TABLE CELLSPACING="0" CELLPADDING="2" BORDER="1" width="100%">
+    <TR> 
+        <TD colspan="3"><b>Table 1: Available commands</b></TD>
+    </TR>
+    <TR> 
+        <TD><i>Query String</i></TD>
+        <TD><i>Result</i></TD>
+    </TR>
+    <TR> 
+        <TD valign="top">action=show&amp;id=<font color="#804000">1</font></TD>
+        <TD>Profile for the specified id (where &quot;1&quot; can be any number 
+            identifying the member profile) </TD>
+    </TR>
+    <TR> 
+        <TD valign="top">action=update</TD>
+        <TD>Updates the member profile via the POST method.</TD>
+    </TR>
+    <TR> 
+        <TD valign="top">action=list&amp;type=nav</TD>
+        <TD>Navigation page using the template list_nav.html</TD>
+    </TR>
+    <TR> 
+        <TD valign="top">action=list&amp;type=full</TD>
+        <TD>All-At-Once View of all member thumbnails using the template list_full.html</TD>
+    </TR>
+    <TR> 
+        <TD valign="top">action=list&amp;type=dartboard</TD>
+        <TD>Dart Board View of all member thumbnails using the template list_dartboard.html</TD>
+    </TR>
+    <TR> 
+        <TD valign="top">action=list&amp;type=sort</TD>
+        <TD>Sort (by most recent) View of all member thumbnails using the template 
+            list_sort.html </TD>
+    </TR>
+    <TR> 
+        <TD valign="top">action=list&amp;type=<font color="#804000">A</font></TD>
+        <TD>List of thumbnails whose member names start with the specified letter. 
+            (where A is any single character)</TD>
+    </TR>
+    <TR>
+        <TD valign="top">action=search&amp;keywords=<font color="#804000">A</font></TD>
+        <TD>Searches contents of all profiles for matching keywords. &quot;keywords&quot; 
+            is an input field</TD>
+    </TR>
+    <TR> 
+        <TD valign="top">action=admin</TD>
+        <TD>Administration feature</TD>
+    </TR>
+</TABLE>
+
+<P>
+<table width="100%" border="0" cellspacing="0" cellpadding="2">
+    <tr> 
+        <td width="50%" valign="top"> <b>To-do list/Work in progress:</b> 
+            <ul>
+                <li><font size="-1">SQL database support</font> 
+                <li><font size="-1">File upload support </font> 
+                <li><font size="-1">Increase photo limit </font> 
+                <li><font size="-1">Complete the administration tool </font> 
+            </ul>
+            <p><b>Development help, donations, postcards and appreciative emails 
+                are more than welcome!</b> </p>
+            <p><b>Some last minute background info:</b></p>
+            <ul>
+                <li><font size="-1"> In case you were wondering what &quot;Duma&quot; 
+                    means: it refers to the <a href="http://www.duma.ru">Parliament of Russia</A>. This basically implies that probably only brave members 
+                    of your board/forum/community will join the Duma ;-)</font></li>
+                <li><font size="-1">I do not claim to be an expert in Perl. Thus, 
+                    I've made this program open-source, hoping others can improve 
+                    on the code and port it to PHP or TCL, etc., but maybe I'll 
+                    do that myself.</font></li>
+                <li><font size="-1">DPGS is licensed under <a href="http://lobsanov.com/ilia/DPGS/license.txt">GNU 
+                    GPL</a></font></li>
+            </ul>
+            <hr>
+            <i><a href="mailto:ilia@lobsanov.com">ilia@lobsanov.com</a></i> 
+            <p>
+        </td>
+        <td valign="top"> <b>Version History</b> 
+            <ul>
+                <li><font size="-1">0.99.4 (June 11, 1999) </font> 
+                    <ul>
+                        <li><font size="-1">Added semi-private functionality.</font></li>
+                        <li><font size="-1">Included half-working admin.dpgs</font></li>
+                    </ul>
+                </li>
+                <li><font size="-1">0.99.3 (June 4, 1999)</font> 
+                    <ul>
+                        <li><font size="-1">Added search capability, sort by last 
+                            update function</font></li>
+                        <li><font size="-1">Refined All-At-Once and Dart Board 
+                            views </font></li>
+                        <li><font size="-1">Added more templates</font></li>
+                        <li><font size="-1">Optimized scripts</font></li>
+                    </ul>
+                </li>
+                <li><font size="-1">0.99.2 (May 5, 1999) </font> 
+                    <ul>
+                        <li><font size="-1">Fixed a nasty bug in list.dpgs (nonexistent 
+                            variable reference $DPGS) </font></li>
+                        <li><font size="-1">Other minor enhancements</font><br>
+                        </li>
+                    </ul>
+                </li>
+                <li><font size="-1">0.99.1 (May 3, 1999) </font> 
+                    <ul>
+                        <li><font size="-1">Architecture and execution methodology 
+                            is improved. Now only the main file (DPGS) need be 
+                            invoked, which &quot;includes&quot; the needed .dpgs 
+                            file depending upon the required &quot;action&quot;</font></li>
+                    </ul>
+                </li>
+                <li><font size="-1">0.99 (April 18, 1999) </font> 
+                    <ul>
+                        <li><font size="-1">Initial open-source release</font></li>
+                    </ul>
+                </li>
+                <li><font size="-1">0.0 (April 22, 1998) </font> 
+                    <ul>
+                        <li><font size="-1">Initial release for Little Russia</font></li>
+                    </ul>
+                </li>
+            </ul>
+        </td>
+  </tr>
+</table>
+
+</body>
+
+</html>

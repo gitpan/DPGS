@@ -1,0 +1,74 @@
+########################################################
+# "update.dpgs" Perl script by ilia@lobsanov.com
+###########
+# This script updates the member's data file, 
+# including the password, if requested.
+########################################################
+
+&check_url;
+&check_password;
+
+# Update member's database file.
+open(DATABASE, ">$path_to_members/$FORM{'id'}/data.txt")
+	|| &error("Couldn't  write $path_to_members/$FORM{'id'}/data.txt");
+	
+while ( ($form_key, $form_value) = each(%FORM) ) {
+	print DATABASE "$form_key$delimiter$form_value\n" unless
+		( $form_value eq '' || $form_key eq "id" || $form_key =~ "password" );
+}
+close(DATABASE);
+
+# Get the name
+for (@members_list) {
+    ($id, $name) = (split(/$delimiter/, $_))[0,1];
+    if ( $id eq $FORM{'id'} ) { last; }
+}
+
+# Update recent.dat
+my $time = time;
+open(FILE, ">$path_to_data/recent.dat") || &error("Couldn't write $path_do_data/recent.dat");
+print FILE "$FORM{'id'}$delimiter$name$delimiter$time\n";
+close(FILE);
+
+print "Content-type: text/html\n\n";
+&html_header("Update Successful!");
+print qq(<P><A HREF="$DETAILS{'DPGS'}?action=show&id=$FORM{'id'}" onClick="parent.nav.location.reload()">);
+print qq(Check my Profile</A><P>\n);
+&html_trailer;
+
+
+sub check_password {
+	for (@members_list) {
+		($id, $name, $password) = split(/$delimiter/, $_);
+		if ( $FORM{'id'} eq $id ) { chop($password); last; }
+	}
+	if ( $FORM{'password'} ne $password ) { 
+		&html_header("Access Denied! Invalid Password.");
+		print("Passwords are case-sensitive.<BR>\n");
+		&html_trailer;
+		exit;
+	}
+	# Change Password?
+	if ( $FORM{'newpassword1'} ne '' ) {
+		if ( $FORM{'newpassword1'} ne $FORM{'newpassword2'} ) {
+			&html_header("Password mis-match");
+			print "You must enter your new password twice.<BR>",
+                "Use your browser's back button to try again.";
+			&html_trailer;
+			exit;
+		}
+		for ( my $i = 0; $i < @members_list; $i ++ ) {
+			my($id, $name, $password) = split(/$delimiter/, $members_list[$i]);
+			if ( $FORM{'id'} eq $id ) {
+				$members_list[$i] = "$id$delimiter$name$delimiter$FORM{'newpassword1'}\n";
+				last;
+			}
+		}
+		open(MEMBERS_LIST, ">$path_to_data/members.idx")
+			|| &error("Couldn't write to MEMBERS_LIST file while checking password.");
+		print MEMBERS_LIST @members_list;
+		close(MEMBERS_LIST);
+	}
+}
+
+1;

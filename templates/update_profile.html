@@ -1,0 +1,176 @@
+<HTML>
+<HEAD>
+	<TITLE>%%home%%: Update Profile</TITLE>
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+function InitRadio(R, val) {
+	for ( var i = 0; i < R.length; i ++ ) {
+		if ( R[i].value == val ) {
+			R[i].checked = true; break;
+		}
+	}
+}
+
+function InitCombo(combo, val) {
+	for ( var i = 0; i < combo.options.length; i ++ ) {
+		if ( combo.options[i].value == val ) {
+			combo.selectedIndex = i; break;
+		}
+	}
+}
+
+function Init(formObj) {
+//    InitRadio(formObj.classic_question3, "%%classic_question3%%");
+    InitCombo(formObj.dob_mon, "%%dob_mon%%");
+    InitCombo(formObj.dob_mday, "%%dob_mday%%");
+    if ( "%%private%%" != "" ) formObj.private.checked = 1;
+}
+//-->
+</SCRIPT>
+</HEAD>
+
+<BODY %%body%% onLoad="Init(document.forms[0])">
+
+<H1>Welcome %%name%%!</H1>
+<H3>Here's your current profile:</H3>
+<FORM METHOD="POST" ACTION="%%DPGS%%">
+    <INPUT TYPE="Hidden" NAME="action" VALUE="update">
+	<INPUT TYPE="Hidden" NAME="id" VALUE="%%id%%">
+	<INPUT TYPE="Hidden" NAME="password" VALUE="%%password%%">
+	<TABLE BORDER=0 CELLSPACING=0>
+	<TR>
+		<TD>E-mail:</TD>
+		<TD><INPUT TYPE="Text" NAME="email" VALUE="%%email%%" SIZE="40"></TD></TR>
+	<TR>
+		<TD><A HREF="http://www.icq.com" TARGET="_blank">ICQ</A> UIN:</TD>
+		<TD><INPUT TYPE="Text" NAME="uin" VALUE="%%uin%%" SIZE="40" MAXLENGTH="10"></TD></TR>
+	<TR>
+		<TD>Home Page:</TD>
+		<TD><INPUT TYPE="Text" NAME="homepage" VALUE="%%homepage%%" SIZE="40"></TD></TR>
+	<TR>
+		<TD>Age:</TD>
+		<TD><INPUT TYPE="Text" NAME="age" VALUE="%%age%%" SIZE="40"></TD></TR>
+	<TR>
+		<TD VALIGN="TOP">Date of birth:</TD>
+		<TD>(for birthday notifications)<BR>
+		<SELECT NAME="dob_mon">
+		<OPTION VALUE="">Select month<OPTION VALUE="1">January<OPTION VALUE="2">February<OPTION VALUE="3">March<OPTION VALUE="4">April<OPTION VALUE="5">May<OPTION VALUE="6">June<OPTION VALUE="7">July<OPTION VALUE="8">August<OPTION VALUE="9">September<OPTION VALUE="10">October<OPTION VALUE="11">November<OPTION VALUE="12">December
+		</SELECT>
+		<SELECT NAME="dob_mday">
+		<OPTION VALUE="">Select date
+		%%dob_date_options%%
+		</SELECT></TD></TR>
+	<TR>
+		<TD>Marital Status:</TD>
+		<TD><INPUT TYPE="Text" NAME="marital_status" VALUE="%%marital_status%%" SIZE="40"></TD></TR>
+	<TR>
+		<TD>Current location:</TD>
+		<TD><INPUT TYPE="Text" NAME="location" VALUE="%%location%%" SIZE="40"></TD></TR>
+	<TR>
+		<TD>Originally from:</TD>
+		<TD><INPUT TYPE="Text" NAME="origin" VALUE="%%origin%%" SIZE="40"></TD></TR>
+	<TR>
+		<TD>Occupation:</TD>
+		<TD><INPUT TYPE="Text" NAME="occupation" VALUE="%%occupation%%" SIZE="40"></TD></TR>
+	<TR>
+		<TD>Sex:</TD>
+		<TD><INPUT TYPE="Text" NAME="sex" VALUE="%%sex%%" SIZE="40"></TD></TR>
+	<TR>
+		<TD>About the photo:</TD>
+		<TD><INPUT TYPE="Text" NAME="about_image1" VALUE="%%about_image1%%" SIZE="40"></TD></TR>
+ 	<TR>
+		<TD>When did you<BR>come to VR?</TD>
+		<TD><INPUT TYPE="Text" NAME="addicted_since" VALUE="%%addicted_since%%" SIZE="40"></TD></TR>
+		
+	<TR><TD COLSPAN=2><HR SIZE=1></TD></TR>
+	<TR>
+		<TD>Last book read:</TD>
+		<TD><INPUT TYPE="Text" NAME="last_book" VALUE="%%last_book%%" SIZE="40"></TD></TR>
+	<TR>
+		<TD COLSPAN=2>Your favourite...</TD></TR>
+	<TR>
+		<TD ALIGN="RIGHT">Book:</TD>
+		<TD><INPUT TYPE="Text" NAME="fav_book" VALUE="%%fav_book%%" SIZE="40"></TD></TR>
+	<TR>
+		<TD ALIGN="RIGHT">Movie:</TD>
+		<TD><INPUT TYPE="Text" NAME="fav_movie" VALUE="%%fav_movie%%" SIZE="40"></TD></TR>
+	<TR>
+		<TD ALIGN="RIGHT">Music:</TD>
+		<TD><INPUT TYPE="Text" NAME="fav_music" VALUE="%%fav_music%%" SIZE="40"></TD></TR>
+	<TR>
+		<TD ALIGN="RIGHT">Song:</TD>
+		<TD><INPUT TYPE="Text" NAME="fav_song" VALUE="%%fav_song%%" SIZE="40"></TD></TR>
+	<TR>
+		<TD ALIGN="RIGHT">Quote:</TD>
+		<TD><INPUT TYPE="Text" NAME="fav_quote" VALUE="%%fav_quote%%" SIZE="40"></TD></TR>
+	<TR>
+		<TD ALIGN="RIGHT">Food:</TD>
+		<TD><INPUT TYPE="Text" NAME="fav_food" VALUE="%%fav_food%%" SIZE="40"></TD></TR>
+	<TR>
+		<TD ALIGN="RIGHT">Drink:</TD>
+		<TD><INPUT TYPE="Text" NAME="fav_drink" VALUE="%%fav_drink%%" SIZE="40"></TD></TR>
+	<TR>
+		<TD ALIGN="RIGHT">Color:</TD>
+		<TD><INPUT TYPE="Text" NAME="fav_color" VALUE="%%fav_color%%" SIZE="40"></TD></TR>
+
+	<TR><TD COLSPAN=2><HR SIZE=1></TD></TR>
+	<TR><TD COLSPAN=2>Some &quot;classic&quot; questions...</TD></TR>
+	<TR>
+		<TD>&nbsp;</TD>
+		<TD>1. What would you do if you had 3 wishes granted by a Genie?
+		<BR><INPUT TYPE="Text" NAME="classic_question1" VALUE="%%classic_question1%%" SIZE="40"></TD></TR>
+	<TR>
+		<TD>&nbsp;</TD>
+		<TD>2. Who would you like to be stranded on a deserted island with?
+		<BR><INPUT TYPE="Text" NAME="classic_question2" VALUE="%%classic_question2%%" SIZE="40"></TD></TR>
+<!--	<TR>
+		<TD>&nbsp;</TD>
+		<TD>3. If you HAD to be visited by one of the following, which would it be:
+		<TABLE CELLSPACING="0" CELLPADDING="0">
+			<TR><TD VALIGN="TOP"><INPUT TYPE="Radio" NAME="classic_question3" VALUE="A"></TD><TD><FONT SIZE="-1">Insurance Salesman</FONT></TD></TR>
+			<TR><TD VALIGN="TOP"><INPUT TYPE="Radio" NAME="classic_question3" VALUE="B"></TD><TD><FONT SIZE="-1">Proctologist</FONT></TD></TR>
+			<TR><TD VALIGN="TOP"><INPUT TYPE="Radio" NAME="classic_question3" VALUE="C"></TD><TD><FONT SIZE="-1">Annoying Door To Door Religious Membership Seeker</FONT></TD></TR>
+			<TR><TD VALIGN="TOP"><INPUT TYPE="Radio" NAME="classic_question3" VALUE="D"></TD><TD><FONT SIZE="-1">An annoying religious membership seeker, <BR>who sells insurance for a living and offers a free exam if you join his group</FONT></TD></TR>
+		</TABLE></TD></TR>
+-->
+	<TR><TD COLSPAN=2><HR SIZE=1></TD></TR>
+	<TR>
+		<TD ALIGN="RIGHT" valign=top>Any last words?</TD>
+		<TD><TEXTAREA NAME="last_words" COLS="45" ROWS="7" WRAP="PHYSICAL">%%last_words%%</TEXTAREA></TD></TR>
+
+	<TR><TD COLSPAN=2><HR SIZE=1></TD></TR>
+	<TR>
+		<TD>Change Password?</TD>
+		<TD><INPUT TYPE="Password" NAME="newpassword1" SIZE="15"> <INPUT TYPE="Password" NAME="newpassword2" SIZE="15"> (enter your new password twice)</TD></TR>
+	<TR>
+		<TD>Make private?</TD>
+		<TD><INPUT TYPE="Checkbox" NAME="private"> 
+        (if checked, only other members will be able to see your profile)</TD></TR>
+
+	<TR><TD COLSPAN=2><HR SIZE=1></TD></TR>
+	<TR>
+		<TD colspan=2>
+		<INPUT TYPE="Submit" VALUE="Update">
+		<INPUT TYPE="RESET" VALUE="Reset" onClick="return confirm('You are about to reset the form. All changes will be lost.\nAre you sure?')">
+		<SCRIPT LANGUAGE="JavaScript">
+		<!--
+		document.write('<INPUT TYPE="Button" VALUE="Cancel" onClick="history.back()">');
+		//-->
+		</SCRIPT>
+		</TD></TR>
+	</TABLE>
+</FORM>
+
+<!-- <FORM ACTION="upload.plx" METHOD=POST> -->
+<FORM>
+<INPUT TYPE="Hidden" NAME="id" VALUE="%%id%%">
+<INPUT TYPE="Hidden" NAME="password" VALUE="%%password%%">
+<INPUT TYPE=SUBMIT VALUE="Upload more photos"><IMG SRC="/images/working.gif" WIDTH=66 HEIGHT=12 BORDER=0 ALIGN="TOP">
+</FORM>
+
+<P><HR>
+<A HREF="%%home_url%%" TARGET="_top">%%home%%</A>
+</P>
+
+</BODY>
+</HTML>

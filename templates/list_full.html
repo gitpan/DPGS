@@ -1,0 +1,41 @@
+<HTML>
+<HEAD>
+<TITLE>%%home%%: All-At-Once View</TITLE>
+<!--
+ The following scripts create an image border highlight effect in IE4
+ Permission is granted to use this with the following conditions:
+ 	1. Credit must be given to the author, Ilia Lobsanov.
+ 	2. Copyright notice must remain intact.
+ Contact the author at ilia@lobsanov.com (http://lobsanov.com)
+-->
+<SCRIPT FOR=document EVENT="onmouseover()" LANGUAGE="JavaScript">
+<!--
+if ( window.event ) {
+	if ( event.srcElement.tagName == "IMG" ) {
+		event.srcElement.border = 0;
+	}
+}
+//-->
+</SCRIPT>
+
+<SCRIPT FOR=document EVENT="onmouseout()" LANGUAGE="JavaScript">
+<!--
+if ( window.event ) {
+	if ( event.srcElement.tagName == "IMG" ) {
+		event.srcElement.border = 1;
+	}
+}
+//-->
+</SCRIPT>
+</HEAD>
+
+<BODY %%body%%>
+
+<CENTER>
+<H2><FONT COLOR="#000080">All-At-Once View</FONT></H2>
+
+%%content%%
+
+</CENTER>
+
+</BODY></HTML>
